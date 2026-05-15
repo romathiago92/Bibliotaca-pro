@@ -1,0 +1,7 @@
+Flask
+Flask-WTF
+WTForms
+Werkzeug
+requests
+matplotlib
+email_validator
