@@ -7,7 +7,7 @@ def login_required(view):
     def wrapped(*args, **kwargs):
         if not session.get('user_id'):
             flash('Debes iniciar sesión para acceder a esta página.', 'warning')
-            return redirect(url_for('login'))
+            return redirect(url_for('auth.login'))  # ✅ corregido
         return view(*args, **kwargs)
 
     return wrapped
@@ -18,7 +18,7 @@ def admin_required(view):
     def wrapped(*args, **kwargs):
         if session.get('role') != 'admin':
             flash('Acceso restringido a administradores.', 'error')
-            return redirect(url_for('catalog'))
+            return redirect(url_for('catalog.catalog'))  # ✅ corregido
         return view(*args, **kwargs)
 
     return wrapped

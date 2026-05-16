@@ -38,6 +38,7 @@
                             <button class="btn btn-secondary" disabled>No hay copias disponibles</button>
                         {% endif %}
                         
+                        <!-- ✅ Ajuste: toggle_favorite ahora apunta a book.toggle_favorite -->
                         <a href="{{ url_for('book.toggle_favorite', book_id=book.id) }}" 
                            class="btn btn-outline-warning">
                             {{ '❤️ Quitar de favoritos' if favorited else '♡ Agregar a favoritos' }}

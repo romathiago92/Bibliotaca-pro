@@ -8,6 +8,40 @@ from db_utils import execute_db
 # ==================== BLUEPRINT ====================
 book_bp = Blueprint('book', __name__)
 
+@book_bp.route('/return/<int:reservation_id>')
+@login_required
+def return_book(reservation_id):
+    # Solo admins pueden devolver
+    if session.get('role') != 'admin':
+        flash("Acción restringida a administradores.", "error")
+        return redirect(url_for('user.my_reservations'))
+
+    conn = get_db_connection()
+    cursor = conn.cursor()
+
+    # Marcar la reserva como devuelta
+    cursor.execute(
+        "UPDATE reservations SET status = 'returned', return_date = CURRENT_TIMESTAMP WHERE id = ?",
+        (reservation_id,)
+    )
+
+    # Actualizar disponibilidad del libro
+    cursor.execute(
+        """
+        UPDATE books 
+        SET available = available + 1 
+        WHERE id = (SELECT book_id FROM reservations WHERE id = ?)
+        """,
+        (reservation_id,)
+    )
+
+    conn.commit()
+    conn.close()
+
+    flash("Libro devuelto correctamente.", "success")
+    return redirect(url_for('user.my_reservations'))
+
+
 @book_bp.route('/book/<int:book_id>')
 @login_required
 def book_detail(book_id):

@@ -1,13 +1,17 @@
-from flask import Blueprint, render_template, request, session
-
+from flask import Blueprint, render_template, request, session, redirect, url_for
 from decorators import login_required
 from helpers import normalize_text, build_filters
 from db_utils import query_db
 
 # ==================== BLUEPRINT ====================
-catalog_bp = Blueprint('catalog', __name__)
+catalog_bp = Blueprint('catalog', __name__, url_prefix='/catalog')
 
-@catalog_bp.route('/catalog', methods=['GET', 'POST'])
+@catalog_bp.route('/')
+def index():
+    # Redirige a la vista principal del catálogo
+    return redirect(url_for('catalog.catalog'))
+
+@catalog_bp.route('/list', methods=['GET', 'POST'])
 @login_required
 def catalog():
     selected_genres = [int(value) for value in request.values.getlist('genres') if value.isdigit()]

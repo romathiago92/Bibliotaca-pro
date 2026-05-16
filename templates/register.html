@@ -5,7 +5,7 @@
 <div class="container mt-4">
     <div class="row justify-content-center">
         <div class="col-md-6">
-            <div class="card">
+            <div class="card shadow-sm">
                 <div class="card-header">
                     <h3 class="text-center mb-0">
                         <i class="fas fa-user-plus me-2"></i>Registro de Usuario
@@ -18,18 +18,18 @@
                             {% for category, message in messages %}
                                 <div class="alert alert-{{ 'danger' if category == 'error' else category }} alert-dismissible fade show" role="alert">
                                     {{ message }}
-                                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Cerrar"></button>
                                 </div>
                             {% endfor %}
                         {% endif %}
                     {% endwith %}
                     
                     <!-- FORMULARIO REGISTRO -->
-                    <form method="POST">
+                    <form method="POST" action="{{ url_for('auth.register') }}">
                         {{ form.hidden_tag() }}
                         
                         <div class="mb-3">
-                            <label class="form-label">Usuario</label>
+                            {{ form.username.label(class="form-label") }}
                             {{ form.username(class="form-control", placeholder="Tu nombre de usuario") }}
                             {% if form.username.errors %}
                                 <div class="text-danger">{{ form.username.errors[0] }}</div>
@@ -37,7 +37,7 @@
                         </div>
                         
                         <div class="mb-3">
-                            <label class="form-label">Email</label>
+                            {{ form.email.label(class="form-label") }}
                             {{ form.email(class="form-control", placeholder="tu@email.com") }}
                             {% if form.email.errors %}
                                 <div class="text-danger">{{ form.email.errors[0] }}</div>
@@ -45,16 +45,16 @@
                         </div>
                         
                         <div class="mb-3">
-                            <label class="form-label">Contraseña</label>
-                            {{ form.password(class="form-control") }}
+                            {{ form.password.label(class="form-label") }}
+                            {{ form.password(class="form-control", placeholder="Ingresa tu contraseña") }}
                             {% if form.password.errors %}
                                 <div class="text-danger">{{ form.password.errors[0] }}</div>
                             {% endif %}
                         </div>
                         
                         <div class="mb-3">
-                            <label class="form-label">Confirmar Contraseña</label>
-                            {{ form.confirm_password(class="form-control") }}
+                            {{ form.confirm_password.label(class="form-label") }}
+                            {{ form.confirm_password(class="form-control", placeholder="Repite tu contraseña") }}
                             {% if form.confirm_password.errors %}
                                 <div class="text-danger">{{ form.confirm_password.errors[0] }}</div>
                             {% endif %}
@@ -67,7 +67,7 @@
                     
                     <div class="text-center mt-3">
                         <p>¿Ya tienes cuenta? 
-                            <a href="{{ url_for('login') }}">Inicia sesión</a>
+                            <a href="{{ url_for('auth.login') }}">Inicia sesión</a>
                         </p>
                     </div>
                 </div>

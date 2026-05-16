@@ -12,9 +12,11 @@ from database import init_db, ensure_optional_tables
 from db_utils import close_db
 
 # ====================== CONFIGURACIÓN ======================
-app = Flask(__name__, 
-            static_folder='static', 
-            template_folder='templates')
+app = Flask(
+    __name__,
+    static_folder='static',
+    template_folder='templates'
+)
 
 app.config.from_mapping(
     SECRET_KEY=os.environ.get('SECRET_KEY', os.urandom(32).hex()),
@@ -31,7 +33,7 @@ app.config.from_mapping(
 logging.basicConfig(level=logging.INFO, format='%(asctime)s %(levelname)s %(message)s')
 app.logger.setLevel(logging.INFO)
 
-# Inicializar base de datos
+# ====================== BASE DE DATOS ======================
 try:
     init_db(app.config['DATABASE'])
     ensure_optional_tables(app.config['DATABASE'])
@@ -54,8 +56,9 @@ app.register_blueprint(user_routes.user_bp)
 
 @app.route('/')
 def home():
+    # Redirige a la ruta inicial del Blueprint auth
     return redirect(url_for('auth.index'))
 
 if __name__ == '__main__':
-    print("🚀 Servidor Flask iniciado en http://127.0.0.1:5000")
-    app.run(host='0.0.0.0', port=5000, debug=True)
+    print("🚀 Servidor Flask iniciado en http://127.0.0.1:5001")
+    app.run(host='0.0.0.0', port=5001, debug=True)

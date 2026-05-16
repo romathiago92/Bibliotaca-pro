@@ -1,5 +1,6 @@
 {% extends 'base.html' %}
 {% block title %}Recomendados{% endblock %}
+
 {% block content %}
 <div class="container mt-4">
     <h2 class="mb-4 text-center">📚 Libros Recomendados para Ti</h2>
@@ -38,13 +39,16 @@
                     </td>
                     <td>
                         <div class="d-flex gap-2 flex-wrap">
-                            <a href="{{ url_for('book_detail', book_id=b.id) }}" class="btn btn-outline-primary btn-sm">Detalle</a>
+                            <a href="{{ url_for('book.book_detail', book_id=b.id) }}" class="btn btn-outline-primary btn-sm">Detalle</a>
+                            
                             {% if b.available > 0 %}
-                                <a href="{{ url_for('reserve_book', book_id=b.id) }}" class="btn btn-success btn-sm">Reservar</a>
+                                <a href="{{ url_for('book.reserve_book', book_id=b.id) }}" class="btn btn-success btn-sm">Reservar</a>
                             {% else %}
                                 <button class="btn btn-secondary btn-sm" disabled>No disponible</button>
                             {% endif %}
-                            <a href="{{ url_for('toggle_favorite', book_id=b.id) }}" class="btn btn-outline-warning btn-sm">
+                            
+                            <!-- ✅ Ajuste: toggle_favorite ahora apunta a book.toggle_favorite -->
+                            <a href="{{ url_for('book.toggle_favorite', book_id=b.id) }}" class="btn btn-outline-warning btn-sm">
                                 Favorito
                             </a>
                         </div>

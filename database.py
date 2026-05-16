@@ -22,17 +22,21 @@ GENRES = [
     'Mitología', 'Cuentos de Hadas', 'Leyendas', 'Folclore', 'Épica',
 ]
 
-ADMIN_USER = {
-    'username': 'alfbiblio',
-    'email': 'alfbiblio@gmail.com',
-    'password': 'alfredo123',
-    'role': 'admin',
-
-    'username': 'Thiago_TheZ',
-    'email': 'romathiago92@gmail.com',
-    'password': '47882877',
-    'role': 'admin'
-}
+# Lista de admins iniciales
+ADMIN_USERS = [
+    {
+        'username': 'alfbiblio',
+        'email': 'alfbiblio@gmail.com',
+        'password': 'alfredo123',
+        'role': 'admin'
+    },
+    {
+        'username': 'Thiago_TheZ',
+        'email': 'romathiago92@gmail.com',
+        'password': '47882877',
+        'role': 'admin'
+    }
+]
 
 
 def get_db_connection(db_path=None):
@@ -103,20 +107,23 @@ def init_db(db_path=None):
         for index, genre in enumerate(GENRES, start=1):
             cursor.execute('INSERT INTO genres (id, name) VALUES (?, ?)', (index, genre))
 
-        cursor.execute(
-            'INSERT INTO users (username, email, password, role) VALUES (?, ?, ?, ?)',
-            (
-                ADMIN_USER['username'],
-                ADMIN_USER['email'],
-                generate_password_hash(ADMIN_USER['password']),
-                ADMIN_USER['role'],
-            ),
-        )
+        # Insertar todos los admins definidos
+        for admin in ADMIN_USERS:
+            cursor.execute(
+                'INSERT INTO users (username, email, password, role) VALUES (?, ?, ?, ?)',
+                (
+                    admin['username'],
+                    admin['email'],
+                    generate_password_hash(admin['password']),
+                    admin['role'],
+                ),
+            )
 
         conn.commit()
 
     print('Base de datos creada correctamente.')
-    print('Admin:', ADMIN_USER['email'], '/', ADMIN_USER['password'])
+    for admin in ADMIN_USERS:
+        print(f"Admin creado: {admin['email']} (contraseña: {admin['password']})")
 
 
 def ensure_optional_tables(db_path=None):

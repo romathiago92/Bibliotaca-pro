@@ -1,19 +1,18 @@
 from flask import Blueprint, render_template, request, redirect, url_for, session, flash
-
 from decorators import login_required
 from forms import RegisterForm, LoginForm
 from db_utils import query_db, execute_db
 from werkzeug.security import generate_password_hash, check_password_hash
 
 # ==================== BLUEPRINT ====================
-auth_bp = Blueprint('auth', __name__)
+auth_bp = Blueprint('auth', __name__, url_prefix='/auth')
 
 @auth_bp.route('/')
 def index():
+    # Si hay sesión, ir al catálogo; si no, mostrar login
     if session.get('user_id'):
         return redirect(url_for('catalog.catalog'))
     return redirect(url_for('auth.login'))
-
 
 @auth_bp.route('/register', methods=['GET', 'POST'])
 def register():
@@ -41,7 +40,6 @@ def register():
 
     return render_template('register.html', form=form)
 
-
 @auth_bp.route('/login', methods=['GET', 'POST'])
 def login():
     form = LoginForm()
@@ -55,14 +53,13 @@ def login():
             flash('Bienvenido de nuevo.', 'success')
             
             if user['role'] == 'admin':
-                return redirect(url_for('admin.admin_dashboard'))  # asumiendo que está en admin blueprint
+                return redirect(url_for('admin.admin_dashboard'))
             else:
                 return redirect(url_for('catalog.catalog'))
 
         flash('Credenciales inválidas.', 'error')
 
     return render_template('login.html', form=form)
-
 
 @auth_bp.route('/logout')
 @login_required
