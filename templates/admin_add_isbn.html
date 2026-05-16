@@ -1,0 +1,39 @@
+{% extends 'base.html' %}
+{% block title %}Agregar Libro{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="card">
+        <div class="card-header bg-success text-white">
+            <h5>✅ Libro Detectado (ISBN: {{ isbn }})</h5>
+        </div>
+        <div class="card-body">
+            <div class="row">
+                <div class="col-md-6">
+                    <h6>📖 Detalles</h6>
+                    <p><strong>Título:</strong> {{ book_info.title }}</p>
+                    <p><strong>Autor:</strong> {{ book_info.author }}</p>
+                    {% if book_info.description %}<p><strong>Descripción:</strong> {{ book_info.description }}...</p>{% endif %}
+                </div>
+                <div class="col-md-6">
+                    <h6>🎯 Géneros Auto</h6>
+                    {% for genre_id in book_info.genres %}
+                        <span class="badge bg-success">{{ genre_map[genre_id] }}</span>
+                    {% endfor %}
+                </div>
+            </div>
+            
+            <form method="POST" action="{{ url_for('admin.add_from_scan') }}">
+                <input type="hidden" name="title" value="{{ book_info.title }}">
+                <input type="hidden" name="author" value="{{ book_info.author }}">
+                {% for genre_id in book_info.genres %}
+                    <input type="hidden" name="genres" value="{{ genre_id }}">
+                {% endfor %}
+                <button type="submit" class="btn btn-success w-100">🚀 AGREGAR A BIBLIOTECA</button>
+            </form>
+            
+            <a href="{{ url_for('admin.admin_books') }}" class="btn btn-secondary w-100 mt-2">← Volver</a>
+        </div>
+    </div>
+</div>
+{% endblock %}

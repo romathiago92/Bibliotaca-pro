@@ -1,0 +1,372 @@
+/* style.css - Estilo moderno y minimalista */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+
+:root {
+    --bg: #f4f7fc;
+    --surface: #ffffff;
+    --surface-soft: #eef4fb;
+    --primary: #1d4ed8;
+    --secondary: #0f766e;
+    --accent: #38bdf8;
+    --text: #102a43;
+    --muted: #64748b;
+    --border: rgba(15, 23, 42, 0.08);
+    --shadow: rgba(15, 23, 42, 0.08);
+    --radius: 18px;
+}
+
+* {
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+    min-height: 100vh;
+    font-family: 'Inter', sans-serif;
+    background: radial-gradient(circle at top left, rgba(56, 189, 248, 0.12), transparent 25%),
+                radial-gradient(circle at bottom right, rgba(29, 78, 216, 0.14), transparent 20%),
+                var(--bg);
+    color: var(--text);
+}
+
+.content-overlay {
+    padding: 2.5rem 0;
+}
+
+.navbar {
+    background: rgba(255, 255, 255, 0.92);
+    border-bottom: 1px solid var(--border);
+    box-shadow: 0 20px 40px rgba(15, 23, 42, 0.05);
+    backdrop-filter: blur(12px);
+}
+
+.navbar-brand {
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    color: var(--primary) !important;
+}
+
+.nav-link {
+    color: var(--text) !important;
+    font-weight: 500;
+    transition: color 0.25s ease, transform 0.25s ease;
+}
+
+.nav-link:hover {
+    color: var(--primary) !important;
+    transform: translateY(-1px);
+}
+
+h1, h2, h3, h4, h5, h6 {
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    color: var(--text);
+    margin-bottom: 1rem;
+}
+
+p, label, .form-label, small, .text-muted {
+    color: var(--muted);
+}
+
+.card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    box-shadow: 0 20px 60px rgba(15, 23, 42, 0.06);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 28px 80px rgba(15, 23, 42, 0.09);
+}
+
+.table {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: calc(var(--radius) - 4px);
+    overflow: hidden;
+    box-shadow: 0 18px 40px rgba(15, 23, 42, 0.05);
+}
+
+.table th, .table td {
+    border-color: transparent;
+    padding: 1rem 1rem;
+    vertical-align: middle;
+}
+
+.table thead {
+    background: var(--surface-soft);
+    color: var(--text);
+}
+
+.table thead th {
+    border-bottom: 1px solid var(--border);
+}
+
+.table tbody tr:hover {
+    background: rgba(56, 189, 248, 0.08);
+}
+
+.form-control, .form-select {
+    background: #fff;
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 0.95rem 1rem;
+    color: var(--text);
+    transition: border-color 0.25s ease, box-shadow 0.25s ease;
+}
+
+.form-control::placeholder {
+    color: var(--muted);
+}
+
+.form-control:focus, .form-select:focus {
+    border-color: var(--primary);
+    box-shadow: 0 0 0 0.25rem rgba(56, 189, 248, 0.18);
+    outline: none;
+}
+
+.btn {
+    border-radius: 999px;
+    font-weight: 600;
+    padding: 0.75rem 1.5rem;
+    transition: transform 0.25s ease, box-shadow 0.25s ease, background 0.25s ease;
+}
+
+.btn:hover {
+    transform: translateY(-1px);
+}
+
+.btn-primary {
+    background: linear-gradient(135deg, var(--primary), var(--accent));
+    border: none;
+    color: #fff;
+    box-shadow: 0 14px 30px rgba(56, 189, 248, 0.25);
+}
+
+.btn-primary:hover {
+    background: linear-gradient(135deg, var(--accent), var(--primary));
+}
+
+.btn-success {
+    background: linear-gradient(135deg, #10b981, #14b8a6);
+    color: #fff;
+}
+
+.btn-outline-primary {
+    color: var(--primary);
+    border-color: var(--primary);
+}
+
+.btn-outline-primary:hover {
+    background: rgba(59, 130, 246, 0.1);
+}
+
+.btn-outline-warning {
+    color: #f97316;
+    border-color: #f97316;
+}
+
+.btn-outline-warning:hover {
+    background: rgba(249, 115, 22, 0.1);
+}
+
+.btn-outline-danger {
+    color: #dc2626;
+    border-color: #dc2626;
+}
+
+.btn-outline-danger:hover {
+    background: rgba(220, 38, 38, 0.1);
+}
+
+.alert {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-left-width: 4px;
+    border-radius: var(--radius);
+    color: var(--text);
+    box-shadow: 0 16px 40px rgba(15, 23, 42, 0.05);
+}
+
+.alert-success {
+    border-left-color: #22c55e;
+}
+
+.alert-danger {
+    border-left-color: #ef4444;
+}
+
+.alert-warning {
+    border-left-color: #f59e0b;
+}
+
+.alert-info {
+    border-left-color: #38bdf8;
+}
+
+.badge {
+    border-radius: 999px;
+    font-weight: 600;
+    padding: 0.4rem 0.8rem;
+    background: rgba(56, 189, 248, 0.12);
+    color: var(--primary);
+}
+
+.book-cover-sm, .book-cover-lg {
+    background: linear-gradient(135deg, #38bdf8 0%, #0f766e 100%);
+    border-radius: 16px;
+    box-shadow: 0 20px 40px rgba(15, 23, 42, 0.08);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #fff;
+    font-weight: 700;
+}
+
+.book-cover-sm {
+    width: 52px;
+    height: 74px;
+}
+
+.book-cover-lg {
+    width: 180px;
+    height: 260px;
+    font-size: 1.1rem;
+}
+
+@media (max-width: 768px) {
+    .navbar-brand {
+        font-size: 1.2rem;
+    }
+
+    .navbar-nav {
+        gap: 0.5rem;
+        flex-wrap: wrap;
+    }
+
+    .table th, .table td {
+        padding: 0.85rem;
+    }
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(16px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.card, .alert {
+    animation: fadeIn 0.45s ease-out;
+}
+    border: 1px solid #ddd;
+}
+
+.badge {
+    color: #2c3e50 !important;
+    font-weight: bold;
+}
+
+* {
+    transition: all 0.3s ease;
+}
+
+/* ESTADÍSTICAS USUARIOS */
+.card.border-primary, .card.border-success, 
+.card.border-warning, .card.border-danger {
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    transition: transform 0.2s;
+}
+.card.border-primary:hover { transform: translateY(-3px); }
+.card.border-success:hover { transform: translateY(-3px); }
+.card.border-warning:hover { transform: translateY(-3px); }
+.card.border-danger:hover { transform: translateY(-3px); }
+
+.table th {
+    font-weight: 600;
+    font-size: 0.85rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+/* ===================================================================
+   CORRECCIÓN FINAL: SIN BORDES INNECESARIOS + LEGIBILIDAD TOTAL
+   =================================================================== */
+
+/* 1. QUITAR text-shadow EN TODOS LOS ELEMENTOS DENTRO DE FONDOS BLANCOS */
+.card *,
+.table *,
+.form-control,
+.form-select,
+.alert *,
+.btn,
+.badge,
+.table th,
+.table td,
+.card .card-body,
+.card .card-title,
+.card .card-text {
+    text-shadow: none !important;
+    color: #2c3e50 !important;
+}
+
+/* 2. QUITAR text-shadow DEL NAVBAR (ya tiene su propio estilo) */
+.navbar .navbar-brand,
+.navbar .nav-link {
+    text-shadow: 0 1px 3px rgba(0, 0, 0, 0.8) !important;
+}
+
+/* 3. TEXTOS FUERA DE TARJETAS (sobre fondo de imagen) → BLANCO + BORDE NEGRO */
+body > .container > h1,
+body > .container > h2,
+body > .container > h3,
+body > .container > h4,
+body > .container > h5,
+body > .container > h6,
+body > .container > p,
+body > .container > label,
+body > .container > .form-label,
+body > .container > .text-muted,
+body > .container > small,
+.content-overlay > .container > .d-flex > h1,
+.content-overlay > .container > .d-flex > .btn,
+.content-overlay > .container > p,
+.content-overlay > .container > small {
+    color: #ffffff !important;
+    text-shadow: 
+        -1px -1px 0 #000,
+        1px -1px 0 #000,
+        -1px 1px 0 #000,
+        1px 1px 0 #000 !important;
+    font-weight: 500;
+}
+
+/* 4. ESTADÍSTICAS: COLORES VIVOS + SIN BORDE BLANCO */
+.card.border-primary { border-left: 5px solid #0d6efd !important; }
+.card.border-success { border-left: 5px solid #198754 !important; }
+.card.border-warning { border-left: 5px solid #ffc107 !important; }
+.card.border-danger { border-left: 5px solid #dc3545 !important; }
+
+.card.border-primary .card-title,
+.card.border-success .card-title,
+.card.border-warning .card-title,
+.card.border-danger .card-title {
+    color: inherit !important;
+    text-shadow: none !important;
+}
+
+/* 5. MEJORAR BADGES EN TABLAS */
+.table .badge {
+    font-size: 0.85rem;
+    padding: 0.4em 0.6em;
+}
+
+/* 6. EFECTO HOVER EN TARJETAS DE ESTADÍSTICAS */
+.card.border-primary:hover,
+.card.border-success:hover,
+.card.border-warning:hover,
+.card.border-danger:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 8px 20px rgba(0,0,0,0.15) !important;
+}

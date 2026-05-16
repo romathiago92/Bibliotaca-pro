@@ -1,0 +1,141 @@
+{% extends 'base.html' %}
+{% block title %}{{ book.title }} - Detalle{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row g-4">
+        <!-- Columna izquierda - Portada e info básica -->
+        <div class="col-md-4">
+            <div class="card shadow-sm">
+                <div class="card-body text-center">
+                    <div class="book-cover-lg mb-4"></div>
+                    <h3>{{ book.title }}</h3>
+                    <p class="text-muted mb-1">{{ book.author }}</p>
+                    <p><strong>Géneros:</strong> {{ book.genre_names or 'Sin género' }}</p>
+                    <p>
+                        <span class="badge bg-{{ 'success' if book.available > 0 else 'danger' }} fs-6">
+                            {{ book.available }} / {{ book.copies }} disponibles
+                        </span>
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Columna derecha - Contenido principal -->
+        <div class="col-md-8">
+            <div class="card shadow-sm">
+                <div class="card-body">
+                    <h4>Acciones</h4>
+                    <div class="d-flex flex-wrap gap-2 mb-4">
+                        <a href="{{ url_for('catalog.catalog') }}" class="btn btn-outline-secondary">
+                            ← Volver al catálogo
+                        </a>
+                        
+                        {% if book.available > 0 %}
+                            <a href="{{ url_for('book.reserve_book', book_id=book.id) }}" 
+                               class="btn btn-success">📖 Reservar Libro</a>
+                        {% else %}
+                            <button class="btn btn-secondary" disabled>No hay copias disponibles</button>
+                        {% endif %}
+                        
+                        <a href="{{ url_for('book.toggle_favorite', book_id=book.id) }}" 
+                           class="btn btn-outline-warning">
+                            {{ '❤️ Quitar de favoritos' if favorited else '♡ Agregar a favoritos' }}
+                        </a>
+                    </div>
+
+                    <h5>Información del Libro</h5>
+                    <ul class="list-group list-group-flush">
+                        <li class="list-group-item"><strong>Título:</strong> {{ book.title }}</li>
+                        <li class="list-group-item"><strong>Autor:</strong> {{ book.author }}</li>
+                        <li class="list-group-item"><strong>Copias totales:</strong> {{ book.copies }}</li>
+                        <li class="list-group-item"><strong>Copias disponibles:</strong> {{ book.available }}</li>
+                        <li class="list-group-item"><strong>Géneros:</strong> {{ book.genre_names or 'Sin género' }}</li>
+                        <li class="list-group-item">
+                            <strong>Calificación media:</strong>
+                            {% if book.review_count > 0 %}
+                                {{ book.average_rating }} / 5.0
+                                <span class="text-warning">
+                                    {% for _ in range(book.average_rating|round|int) %}
+                                        <i class="fa-solid fa-star"></i>
+                                    {% endfor %}
+                                    {% for _ in range(5 - book.average_rating|round|int) %}
+                                        <i class="fa-regular fa-star"></i>
+                                    {% endfor %}
+                                </span>
+                            {% else %}
+                                Sin calificaciones aún
+                            {% endif %}
+                        </li>
+                        <li class="list-group-item"><strong>Total de reseñas:</strong> {{ book.review_count }}</li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Formulario para dejar reseña -->
+            <div class="card shadow-sm mt-4">
+                <div class="card-body">
+                    <h5 class="mb-3">⭐ Deja tu reseña</h5>
+                    <form method="POST" action="{{ url_for('book.submit_book_review', book_id=book.id) }}">
+                        <div class="mb-3">
+                            <label class="form-label">Calificación</label>
+                            <select class="form-select" name="rating" required>
+                                <option value="">Selecciona una calificación</option>
+                                {% for value in range(1, 6) %}
+                                <option value="{{ value }}">{{ value }} estrella{{ 's' if value > 1 else '' }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Comentario</label>
+                            <textarea class="form-control" name="comment" rows="4" 
+                                      placeholder="¿Qué te pareció este libro?"></textarea>
+                        </div>
+                        <button type="submit" class="btn btn-primary">Publicar Reseña</button>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Reseñas de otros usuarios -->
+            <div class="card shadow-sm mt-4">
+                <div class="card-body">
+                    <h5 class="mb-3">Reseñas de otros lectores</h5>
+                    {% if reviews %}
+                        <div class="list-group">
+                            {% for review in reviews %}
+                                <div class="list-group-item">
+                                    <div class="d-flex justify-content-between align-items-center mb-2">
+                                        <div>
+                                            <strong>{{ review.username }}</strong>
+                                            <span class="text-muted">· {{ review.created_at[:16].replace('T', ' ') }}</span>
+                                        </div>
+                                        <div class="text-warning">
+                                            {% for _ in range(review.rating) %}<i class="fa-solid fa-star"></i>{% endfor %}
+                                            {% for _ in range(5 - review.rating) %}<i class="fa-regular fa-star"></i>{% endfor %}
+                                        </div>
+                                    </div>
+                                    <p class="mb-0">{{ review.comment }}</p>
+                                </div>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        <p class="text-muted">Aún no hay reseñas para este libro. ¡Sé el primero!</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+.book-cover-lg {
+    width: 180px;
+    height: 250px;
+    margin: 0 auto;
+    background: #f0f0f0;
+    border-radius: 12px;
+    background-image: url('data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 140%22><rect width=%22100%22 height=%22140%22 fill=%22%23ddd%22/><text x=%2250%22 y=%2270%22 font-family=%22Arial%22 font-size=%2216%22 text-anchor=%22middle%22 fill=%22%23666%22 dominant-baseline=%22middle%22>Portada</text></svg>');
+    background-size: cover;
+}
+</style>
+{% endblock %}

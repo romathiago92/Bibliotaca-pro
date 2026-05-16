@@ -1,0 +1,50 @@
+{% extends 'base.html' %}
+{% block title %}Editar Libro{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-md-10 mx-auto">
+            <div class="card shadow-sm">
+                <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0">✏️ Editar Libro</h5>
+                    <!-- Volver a la lista de libros -->
+                    <a href="{{ url_for('admin.admin_books') }}" class="btn btn-sm btn-light">
+                        ← Volver
+                    </a>
+                </div>
+                
+                <div class="card-body">
+                    <form method="post">
+                        {{ form.hidden_tag() }}
+                        
+                        <div class="row g-3 align-items-end">
+                            <div class="col-md-4">
+                                <label class="form-label">Título</label>
+                                {{ form.title(class="form-control") }}
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label">Autor</label>
+                                {{ form.author(class="form-control") }}
+                            </div>
+                            <div class="col-md-2">
+                                <label class="form-label">Copias Totales</label>
+                                {{ form.copies(class="form-control", min="1") }}
+                            </div>
+                            <div class="col-md-2">
+                                {{ form.submit(class="btn btn-success w-100") }}
+                            </div>
+                        </div>
+
+                        <div class="mt-4">
+                            <label class="form-label">Géneros</label>
+                            {{ form.genres(class="form-select", multiple=True, size="6", style="height: 180px;") }}
+                            <small class="text-muted">Mantén presionado <strong>Ctrl</strong> para seleccionar varios géneros</small>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,148 @@
+{% extends 'base.html' %}
+{% block title %}Perfil de Usuario - Admin{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1 class="h3 mb-0">👤 Perfil de Usuario: {{ user.username }}</h1>
+        <a href="{{ url_for('admin.admin_users') }}" class="btn btn-outline-secondary btn-sm">
+            ← Volver a Usuarios
+        </a>
+    </div>
+
+    <!-- Mensajes Flash -->
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            <div class="mb-4">
+                {% for category, message in messages %}
+                    <div class="alert alert-{{ 'danger' if category == 'error' else 'info' if category in ['message', 'success'] else category }} alert-dismissible fade show">
+                        {{ message }}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                    </div>
+                {% endfor %}
+            </div>
+        {% endif %}
+    {% endwith %}
+
+    <!-- ESTADÍSTICAS -->
+    <div class="row mb-4 g-3">
+        <div class="col-md-6">
+            <div class="card border-primary text-primary">
+                <div class="card-body text-center">
+                    <h5 class="card-title">Libros Prestados Total</h5>
+                    <h3 class="mb-0">{{ total_borrowed }}</h3>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="card border-success text-success">
+                <div class="card-body text-center">
+                    <h5 class="card-title">Libros Devueltos</h5>
+                    <h3 class="mb-0">{{ total_returned }}</h3>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- LIBROS PENDIENTES -->
+    <div class="card mb-4">
+        <div class="card-header bg-warning text-white">
+            <h5>📌 Libros Pendientes de Devolución</h5>
+        </div>
+        <div class="card-body">
+            {% if pending_books %}
+                <div class="table-responsive">
+                    <table class="table table-striped">
+                        <thead>
+                            <tr>
+                                <th>Título</th>
+                                <th>Fecha de Préstamo</th>
+                                <th>Fecha de Vencimiento</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for book in pending_books %}
+                            <tr>
+                                <td>{{ book.title }}</td>
+                                <td>{{ book.loan_date }}</td>
+                                <td>{{ book.due_date }}</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            {% else %}
+                <p class="text-muted">No hay libros pendientes para este usuario.</p>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- LIBROS RESERVADOS -->
+    <div class="card mb-4">
+        <div class="card-header bg-info text-white">
+            <h5>📚 Libros Reservados</h5>
+        </div>
+        <div class="card-body">
+            {% if reserved_books %}
+                <div class="table-responsive">
+                    <table class="table table-striped">
+                        <thead>
+                            <tr>
+                                <th>Título</th>
+                                <th>Fecha de Reserva</th>
+                                <th>Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for book in reserved_books %}
+                            <tr>
+                                <td>{{ book.title }}</td>
+                                <td>{{ book.loan_date }}</td>
+                                <td>
+                                    <form method="POST" action="{{ url_for('admin.deliver_reservation', reservation_id=book.id) }}" style="display:inline;">
+                                        <button type="submit" class="btn btn-success btn-sm">✅ Entregar</button>
+                                    </form>
+                                    <form method="POST" action="{{ url_for('admin.deny_reservation', reservation_id=book.id) }}" style="display:inline;">
+                                        <button type="submit" class="btn btn-danger btn-sm">❌ Denegar</button>
+                                    </form>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            {% else %}
+                <p class="text-muted">No hay libros reservados actualmente.</p>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- RESEÑAS DEL USUARIO -->
+    <div class="card">
+        <div class="card-header">
+            <h5>⭐ Reseñas del Usuario</h5>
+        </div>
+        <div class="card-body">
+            {% if user_reviews %}
+                <div class="list-group">
+                    {% for review in user_reviews %}
+                        <div class="list-group-item">
+                            <div class="d-flex justify-content-between align-items-center mb-2">
+                                <strong>{{ review.book_title }}</strong>
+                                <span class="text-warning">
+                                    {% for _ in range(review.rating) %}<i class="fa-solid fa-star"></i>{% endfor %}
+                                    {% for _ in range(5 - review.rating) %}<i class="fa-regular fa-star"></i>{% endfor %}
+                                </span>
+                            </div>
+                            <p class="mb-1">{{ review.comment }}</p>
+                            <small class="text-muted">{{ review.created_at[:16].replace('T', ' ') }}</small>
+                        </div>
+                    {% endfor %}
+                </div>
+            {% else %}
+                <p class="text-muted">Este usuario aún no ha escrito reseñas.</p>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,99 @@
+{% extends 'base.html' %}
+{% block title %}Dashboard Admin{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <h2 class="mb-4">📊 Dashboard Administrador</h2>
+    
+    <!-- Mensajes Flash -->
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            {% for category, message in messages %}
+                <div class="alert alert-{{ 'danger' if category == 'error' else category }} alert-dismissible fade show" role="alert">
+                    {{ message }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+            {% endfor %}
+        {% endif %}
+    {% endwith %}
+    
+    <!-- ESTADÍSTICAS -->
+    <div class="row mb-4">
+        <div class="col-md-3">
+            <div class="card bg-primary text-white">
+                <div class="card-body text-center">
+                    <h2>{{ stats.users }}</h2>
+                    <p class="mb-0">Usuarios Totales</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card bg-success text-white">
+                <div class="card-body text-center">
+                    <h2>{{ stats.books }}</h2>
+                    <p class="mb-0">Libros</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card bg-info text-white">
+                <div class="card-body text-center">
+                    <h2>{{ stats.returns }}</h2>
+                    <p class="mb-0">Devoluciones</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card bg-warning text-white">
+                <div class="card-body text-center">
+                    <h2>{{ stats.reservations }}</h2>
+                    <p class="mb-0">Reservas Activas</p>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- GRÁFICO DE ACTIVIDAD -->
+    <div class="card mb-4">
+        <div class="card-header">
+            <h5>📈 Actividad - Últimos 30 Días</h5>
+        </div>
+        <div class="card-body">
+            {% if graph_path and graph_path != 'None' %}
+                <img src="{{ graph_path }}" class="img-fluid" alt="Gráfico de Actividad" style="max-width: 100%; height: auto;">
+                <p class="text-muted mt-2 small">Archivo: {{ graph_path }}</p>
+            {% else %}
+                <div class="alert alert-warning">
+                    <h6>⚠️ Gráfico no disponible</h6>
+                    <p>Revisa la consola del servidor para ver errores relacionados con matplotlib.</p>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+    
+    <!-- GENERAR DATOS DE PRUEBA -->
+    <div class="alert alert-warning mb-4">
+        <h6>⚠️ Función de Pruebas (Solo Desarrollo)</h6>
+        <p>Este botón genera datos aleatorios para probar la aplicación.</p>
+        <form method="POST" action="{{ url_for('admin.generate_test_data') }}">
+            <button type="submit" class="btn btn-warning">
+                🔄 Generar 100 Usuarios, Libros y Registros
+            </button>
+        </form>
+    </div>
+    
+    <!-- ENLACES RÁPIDOS -->
+    <div class="row g-3">
+        <div class="col-md-6">
+            <a href="{{ url_for('admin.admin_users') }}" class="btn btn-secondary w-100 mb-2">
+                👥 Gestionar Usuarios
+            </a>
+        </div>
+        <div class="col-md-6">
+            <a href="{{ url_for('admin.admin_books') }}" class="btn btn-secondary w-100 mb-2">
+                📚 Gestionar Libros
+            </a>
+        </div>
+    </div>
+</div>
+{% endblock %}

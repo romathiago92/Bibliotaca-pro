@@ -1,0 +1,108 @@
+{% extends 'base.html' %}
+{% block title %}Usuarios del Sistema - Admin{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1 class="h3 mb-0">👥 Usuarios del Sistema</h1>
+        <a href="{{ url_for('admin.admin_dashboard') }}" class="btn btn-outline-secondary btn-sm">
+            ← Volver al Dashboard
+        </a>
+    </div>
+
+    <!-- Mensajes Flash -->
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            <div class="mb-4">
+                {% for category, message in messages %}
+                    <div class="alert alert-{{ 'danger' if category == 'error' else 'info' if category in ['message', 'success'] else category }} alert-dismissible fade show">
+                        {{ message }}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                    </div>
+                {% endfor %}
+            </div>
+        {% endif %}
+    {% endwith %}
+
+    <!-- TARJETAS DE RESUMEN -->
+    <div class="row mb-4 g-3">
+        <div class="col-md-3">
+            <div class="card border-primary text-primary">
+                <div class="card-body text-center">
+                    <h5 class="card-title mb-1">Total Usuarios</h5>
+                    <h3 class="mb-0">{{ users|length }}</h3>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card border-success text-success">
+                <div class="card-body text-center">
+                    <h5 class="card-title mb-1">Devueltos</h5>
+                    <h3 class="mb-0">{{ users|sum(attribute='returned')|default(0) }}</h3>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card border-warning text-warning">
+                <div class="card-body text-center">
+                    <h5 class="card-title mb-1">Reservados</h5>
+                    <h3 class="mb-0">{{ users|sum(attribute='reserved')|default(0) }}</h3>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card border-danger text-danger">
+                <div class="card-body text-center">
+                    <h5 class="card-title mb-1">Pendientes</h5>
+                    <h3 class="mb-0">{{ users|sum(attribute='pending')|default(0) }}</h3>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- TABLA DE USUARIOS -->
+    {% if users %}
+    <div class="table-responsive">
+        <table class="table table-hover align-middle">
+            <thead class="table-dark">
+                <tr>
+                    <th>Usuario</th>
+                    <th>Email</th>
+                    <th>Puntaje Responsabilidad</th>
+                    <th>Devueltos</th>
+                    <th>Reservados</th>
+                    <th>Pendientes</th>
+                    <th>Acciones</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for user in users %}
+                <tr>
+                    <td><strong>{{ user.username }}</strong></td>
+                    <td><small class="text-muted">{{ user.email }}</small></td>
+                    <td>
+                        <span class="badge bg-{{ 'success' if user.responsibility_score >= 80 else 'warning' if user.responsibility_score >= 50 else 'danger' }} fs-6">
+                            {{ user.responsibility_score|round(1) }}
+                        </span>
+                    </td>
+                    <td><span class="badge bg-success">{{ user.returned }}</span></td>
+                    <td><span class="badge bg-warning text-dark">{{ user.reserved }}</span></td>
+                    <td><span class="badge bg-danger">{{ user.pending }}</span></td>
+                    <td>
+                        <a href="{{ url_for('admin.admin_user_profile', user_id=user.id) }}" 
+                           class="btn btn-primary btn-sm">
+                            Ver Perfil
+                        </a>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% else %}
+    <div class="text-center py-5">
+        <p class="text-muted fs-5">No hay usuarios registrados en el sistema.</p>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

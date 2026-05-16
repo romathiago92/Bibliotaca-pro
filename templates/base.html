@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Biblioteca{% endblock %}</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    
+    <style>
+        body {
+            min-height: 100vh;
+            background: radial-gradient(circle at top, rgba(29, 78, 216, 0.25), transparent 30%),
+                        linear-gradient(180deg, #0f172a 0%, #020617 100%);
+            color: #1f2937;
+        }
+        .page-shell {
+            min-height: 100vh;
+            padding-top: 5.5rem;
+            padding-bottom: 2.5rem;
+        }
+        .content-panel {
+            background: rgba(255, 255, 255, 0.92);
+            backdrop-filter: blur(14px);
+            border: 1px solid rgba(255, 255, 255, 0.14);
+            box-shadow: 0 24px 50px rgba(15, 23, 42, 0.12);
+            border-radius: 1rem;
+            padding: 2rem;
+        }
+        .navbar-brand {
+            font-weight: 700;
+            letter-spacing: .06rem;
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark bg-opacity-90 fixed-top shadow-sm">
+        <div class="container">
+            <!-- Logo / Nombre -->
+            <a class="navbar-brand" href="{{ url_for('auth.index') }}">
+                📚 Biblioteca
+            </a>
+
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#mainNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+
+            {% if session.get('user_id') %}
+            <div class="collapse navbar-collapse" id="mainNav">
+                <ul class="navbar-nav ms-auto align-items-lg-center">
+                    
+                    {% if session.get('role') == 'admin' %}
+                        <li class="nav-item"><a class="nav-link" href="{{ url_for('admin.admin_dashboard') }}">Dashboard</a></li>
+                        <li class="nav-item"><a class="nav-link" href="{{ url_for('admin.admin_users') }}">Usuarios</a></li>
+                        <li class="nav-item"><a class="nav-link" href="{{ url_for('admin.admin_books') }}">Libros</a></li>
+                    {% endif %}
+
+                    <li class="nav-item"><a class="nav-link" href="{{ url_for('catalog.catalog') }}">Catálogo</a></li>
+                    <li class="nav-item"><a class="nav-link" href="{{ url_for('catalog.catalog', favorites='true') }}">Favoritos</a></li>
+                    <li class="nav-item"><a class="nav-link" href="{{ url_for('user.recommended') }}">Recomendados</a></li>
+                    <li class="nav-item"><a class="nav-link" href="{{ url_for('user.my_reservations') }}">Mis Reservas</a></li>
+                    <li class="nav-item"><a class="nav-link" href="{{ url_for('user.profile') }}">Perfil</a></li>
+                    
+                    <li class="nav-item ms-lg-3">
+                        <a class="btn btn-outline-light btn-sm" href="{{ url_for('auth.logout') }}">Salir</a>
+                    </li>
+                </ul>
+            </div>
+            {% endif %}
+        </div>
+    </nav>
+
+    <main class="page-shell">
+        <div class="container">
+            <!-- Mensajes Flash Globales -->
+            {% with messages = get_flashed_messages(with_categories=true) %}
+                {% if messages %}
+                    <div class="flash-wrapper mb-3">
+                        {% for category, message in messages %}
+                            <div class="alert alert-{{ 'danger' if category == 'error' else category }} alert-dismissible fade show" role="alert">
+                                {{ message }}
+                                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Cerrar"></button>
+                            </div>
+                        {% endfor %}
+                    </div>
+                {% endif %}
+            {% endwith %}
+
+            <div class="content-panel">
+                {% block content %}{% endblock %}
+            </div>
+        </div>
+    </main>
+
+    <footer class="text-center py-3 mt-4">
+        <div class="container">
+            <small>Biblioteca - Sistema de Gestión © 2026</small>
+        </div>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

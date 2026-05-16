@@ -1,0 +1,78 @@
+{% extends 'base.html' %}
+{% block title %}Mi Perfil{% endblock %}
+{% block content %}
+<div class="container mt-4">
+    <div class="row g-4">
+        <div class="col-md-4">
+            <div class="card shadow-sm">
+                <div class="card-body">
+                    <h3>Perfil</h3>
+                    <p><strong>Usuario:</strong> {{ user.username }}</p>
+                    <p><strong>Email:</strong> {{ user.email }}</p>
+                    <p><strong>Rol:</strong> {{ user.role }}</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-8">
+            <div class="card shadow-sm">
+                <div class="card-body">
+                    <h3>Estado</h3>
+                    <div class="row text-center">
+                        <div class="col-md-4 mb-3">
+                            <div class="p-3 bg-light rounded">
+                                <h4>{{ stats.active }}</h4>
+                                <p class="mb-0">Reservas activas</p>
+                            </div>
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <div class="p-3 bg-light rounded">
+                                <h4>{{ stats.returned }}</h4>
+                                <p class="mb-0">Devoluciones</p>
+                            </div>
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <div class="p-3 bg-light rounded">
+                                <h4>{{ stats.favorites }}</h4>
+                                <p class="mb-0">Favoritos</p>
+                            </div>
+                        </div>
+                    </div>
+                    <a href="{{ url_for('my_reservations') }}" class="btn btn-primary">Ver mis reservas</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="card shadow-sm mt-4">
+        <div class="card-body">
+            <h3>Reseñas Recientes</h3>
+            {% if reviews %}
+                <div class="list-group">
+                    {% for review in reviews[:5] %}
+                        <div class="list-group-item">
+                            <div class="d-flex justify-content-between align-items-center mb-2">
+                                <strong>{{ review.book_title }}</strong>
+                                <span class="text-warning">
+                                    {% for _ in range(review.rating) %}
+                                        <i class="fa-solid fa-star"></i>
+                                    {% endfor %}
+                                    {% for _ in range(5 - review.rating) %}
+                                        <i class="fa-regular fa-star"></i>
+                                    {% endfor %}
+                                </span>
+                            </div>
+                            <p class="mb-1">{{ review.comment }}</p>
+                            <small class="text-muted">{{ review.created_at[:16].replace('T', ' ') }}</small>
+                        </div>
+                    {% endfor %}
+                </div>
+                {% if reviews|length > 5 %}
+                    <p class="text-muted mt-3">Mostrando las 5 reseñas más recientes.</p>
+                {% endif %}
+            {% else %}
+                <p class="text-muted">Aún no has dejado reseñas. Visita un libro para comentar y calificar.</p>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

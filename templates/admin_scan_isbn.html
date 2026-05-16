@@ -1,0 +1,209 @@
+{% extends "base.html" %}
+{% block title %}Escanear ISBN{% endblock %}
+
+{% block content %}
+<div class="container mt-3 mt-md-5">
+    <div class="row justify-content-center">
+        <div class="col-12 col-md-10 col-lg-8">
+            <div class="card shadow-lg border-primary">
+                <div class="card-header bg-primary text-white text-center">
+                    <h3 class="h4 h-md-3">ESCANEAR O PEGAR ISBN</h3>
+                </div>
+                <div class="card-body text-center px-3 px-md-4">
+
+                    <!-- ALERTAS -->
+                    {% with messages = get_flashed_messages(with_categories=true) %}
+                      {% if messages %}
+                        {% for category, message in messages %}
+                          <div class="alert alert-{{ 'danger' if category == 'error' else category }} alert-dismissible fade show">
+                            {{ message }}
+                            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                          </div>
+                        {% endfor %}
+                      {% endif %}
+                    {% endwith %}
+
+                    <!-- SELECCIÓN DE CÁMARA -->
+                    <div class="mb-3 mb-md-4">
+                        <h5 class="h6 h-md-5">Selecciona la fuente de video</h5>
+                        <select id="cameraSelect" class="form-select form-select-lg mb-2 mb-md-3">
+                            <option value="">Cargando cámaras...</option>
+                        </select>
+                        <button id="refreshCameras" class="btn btn-outline-secondary">Actualizar cámaras</button>
+                    </div>
+
+                    <!-- CÁMARA -->
+                    <div class="mb-3 mb-md-4">
+                        <h5 class="h6 h-md-5">Escanea con cámara</h5>
+                        <video id="video" class="w-100 rounded mb-2 mb-md-3" style="max-height: 250px; height: auto; object-fit: cover;" autoplay playsinline></video>
+                        <canvas id="canvas" class="d-none"></canvas>
+                        <p id="scanStatus" class="text-muted fw-bold small">Selecciona una cámara y haz clic para iniciar</p>
+                        <div class="d-flex justify-content-center gap-2 flex-wrap">
+                            <button id="scanBtn" class="btn btn-success px-3 px-md-5">INICIAR ESCANEO</button>
+                            <button id="stopBtn" class="btn btn-danger px-3 px-md-5 d-none">DETENER</button>
+                        </div>
+                    </div>
+
+                    <hr class="my-3 my-md-4">
+
+                    <!-- PEGAR ISBN -->
+                    <div class="mb-3 mb-md-4">
+                        <h5 class="h6 h-md-5">O pega el ISBN</h5>
+                        <form method="post" action="{{ url_for('process_isbn') }}" id="manualForm">
+                            <div class="input-group mb-2 mb-md-3" style="max-width: 500px; margin: 0 auto;">
+                                <input 
+                                    type="text" 
+                                    name="isbn" 
+                                    class="form-control form-control-lg" 
+                                    placeholder="Ej: 9780743273565" 
+                                    id="isbnInput"
+                                    required
+                                >
+                                <button class="btn btn-primary" type="submit">BUSCAR</button>
+                            </div>
+                        </form>
+                        <small class="text-muted d-block">
+                            Prueba: <code>9780743273565</code> → The Great Gatsby
+                        </small>
+                    </div>
+
+                    <!-- RESULTADO -->
+                    <div id="result" class="mt-3 mt-md-4 d-none">
+                        <h5 class="h6 h-md-5">ISBN Detectado:</h5>
+                        <p id="detectedIsbn" class="h4 text-success mb-3"></p>
+                        <button id="useIsbn" class="btn btn-primary">Usar este ISBN</button>
+                    </div>
+
+                    <div class="mt-3 mt-md-4">
+                        <a href="{{ url_for('admin_books') }}" class="btn btn-secondary">Volver</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ZXing + CÁMARA -->
+<script src="https://unpkg.com/@zxing/library@0.19.1/dist/index.min.js"></script>
+<script>
+    const video = document.getElementById('video');
+    const scanBtn = document.getElementById('scanBtn');
+    const stopBtn = document.getElementById('stopBtn');
+    const scanStatus = document.getElementById('scanStatus');
+    const isbnInput = document.getElementById('isbnInput');
+    const manualForm = document.getElementById('manualForm');
+    const cameraSelect = document.getElementById('cameraSelect');
+    const refreshCameras = document.getElementById('refreshCameras');
+    const resultDiv = document.getElementById('result');
+    const detectedIsbn = document.getElementById('detectedIsbn');
+    const useIsbn = document.getElementById('useIsbn');
+
+    let codeReader = null;
+    let scanning = false;
+    let selectedDeviceId = null;
+
+    async function enumerateCameras() {
+        try {
+            const devices = await navigator.mediaDevices.enumerateDevices();
+            const videoDevices = devices.filter(device => device.kind === 'videoinput');
+            
+            cameraSelect.innerHTML = '<option value="">Selecciona una cámara</option>';
+            
+            videoDevices.forEach((device, index) => {
+                const option = document.createElement('option');
+                option.value = device.deviceId;
+                option.textContent = device.label || `Cámara ${index + 1}`;
+                cameraSelect.appendChild(option);
+            });
+            
+            if (videoDevices.length === 0) {
+                cameraSelect.innerHTML = '<option value="">No se encontraron cámaras</option>';
+            }
+        } catch (error) {
+            console.error('Error enumerando dispositivos:', error);
+            cameraSelect.innerHTML = '<option value="">Error al cargar cámaras</option>';
+        }
+    }
+
+    cameraSelect.addEventListener('change', () => {
+        selectedDeviceId = cameraSelect.value;
+    });
+
+    refreshCameras.addEventListener('click', enumerateCameras);
+
+    scanBtn.addEventListener('click', () => {
+        if (scanning) {
+            stopScan();
+        } else {
+            startScan();
+        }
+    });
+
+    stopBtn.addEventListener('click', stopScan);
+
+    useIsbn.addEventListener('click', () => {
+        isbnInput.value = detectedIsbn.textContent;
+        manualForm.submit();
+    });
+
+    function startScan() {
+        if (!selectedDeviceId) {
+            alert('Selecciona una cámara primero');
+            return;
+        }
+
+        scanStatus.textContent = 'Solicitando acceso a cámara...';
+        scanBtn.classList.add('d-none');
+        stopBtn.classList.remove('d-none');
+
+        codeReader = new ZXing.BrowserMultiFormatReader();
+        codeReader.decodeFromVideoDevice(selectedDeviceId, 'video', (result, err) => {
+            if (result) {
+                const raw = result.text;
+                const isbn = raw.replace(/[^0-9X]/gi, '').toUpperCase();
+                if (isbn.length >= 10 && isbn.length <= 13) {
+                    scanStatus.textContent = `Detectado: ${isbn}`;
+                    detectedIsbn.textContent = isbn;
+                    resultDiv.classList.remove('d-none');
+                    stopScan();
+                }
+            }
+            if (err && !(err instanceof ZXing.NotFoundException)) {
+                scanStatus.textContent = 'Error: ' + err.message;
+                console.error(err);
+            }
+        }).catch(err => {
+            scanStatus.textContent = 'Error: No se pudo acceder a la cámara';
+            scanBtn.classList.remove('d-none');
+            stopBtn.classList.add('d-none');
+            console.error('Cámara denegada o error:', err);
+        });
+        scanning = true;
+    }
+
+    function stopScan() {
+        if (codeReader) {
+            codeReader.reset();
+            codeReader = null;
+        }
+        if (video.srcObject) {
+            video.srcObject.getTracks().forEach(track => track.stop());
+        }
+        scanBtn.classList.remove('d-none');
+        stopBtn.classList.add('d-none');
+        scanStatus.textContent = 'Selecciona una cámara y haz clic para iniciar';
+        scanning = false;
+    }
+
+    // ENTER EN INPUT
+    isbnInput.addEventListener('keypress', e => {
+        if (e.key === 'Enter') {
+            e.preventDefault();
+            manualForm.submit();
+        }
+    });
+
+    // Inicializar
+    enumerateCameras();
+</script>
+{% endblock %}

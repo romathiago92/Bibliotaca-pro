@@ -1,0 +1,51 @@
+{% extends 'base.html' %}
+{% block title %}Mis Reservas{% endblock %}
+{% block content %}
+<div class="container mt-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2>Mis Reservas</h2>
+        <a href="{{ url_for('catalog') }}" class="btn btn-outline-secondary">Volver al catálogo</a>
+    </div>
+
+    {% if reservations %}
+    <div class="table-responsive">
+        <table class="table table-hover align-middle">
+            <thead class="table-light">
+                <tr>
+                    <th>Libro</th>
+                    <th>Autor</th>
+                    <th>Fecha de préstamo</th>
+                    <th>Vence</th>
+                    <th>Estado</th>
+                    <th>Acción</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for r in reservations %}
+                <tr>
+                    <td><strong>{{ r.title }}</strong></td>
+                    <td>{{ r.author }}</td>
+                    <td>{{ r.loan_date or 'N/A' }}</td>
+                    <td>{{ r.due_date or 'N/A' }}</td>
+                    <td>
+                        <span class="badge bg-{{ 'success' if r.status == 'returned' else 'warning' if r.status == 'reserved' else 'secondary' }}">
+                            {{ r.status.title() }}
+                        </span>
+                    </td>
+                    <td>
+                        {% if r.status != 'returned' %}
+                            <a href="{{ url_for('return_book', reservation_id=r.id) }}" class="btn btn-sm btn-outline-success">Marcar devuelto</a>
+                        {% else %}
+                            <span class="text-muted">Cerrado</span>
+                        {% endif %}
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% else %}
+    <div class="alert alert-info">Aún no tienes reservas activas.</div>
+    {% endif %}
+</div>
+{% endblock %}

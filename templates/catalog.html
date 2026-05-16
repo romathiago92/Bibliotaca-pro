@@ -1,0 +1,109 @@
+{% extends "base.html" %}
+{% block title %}Catálogo de Libros{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <section class="catalog-hero mb-5">
+        <div class="hero-copy">
+            <span class="eyebrow">Selección Curada</span>
+            <h1 class="headline-large">Catálogo de Libros</h1>
+            <p class="hero-subtitle">Explora nuestra colección completa de libros disponibles.</p>
+            <div class="hero-meta">
+                <span class="badge">{{ '❤️ Mis Favoritos' if favorite_mode else '📚 Catálogo General' }}</span>
+            </div>
+        </div>
+    </section>
+
+    <!-- BUSCADOR Y FILTROS -->
+    <form method="post" class="row g-3 mb-4">
+        <div class="col-md-6">
+            <input type="text" name="search" class="form-control" 
+                   placeholder="Buscar por título o autor..." value="{{ search }}">
+        </div>
+        <div class="col-md-4">
+            <select name="genres" class="form-select" multiple size="5">
+                <option value="">Todos los géneros</option>
+                {% for g in genres %}
+                <option value="{{ g.id }}" 
+                        {% if g.id|string in selected_genres %}selected{% endif %}>
+                    {{ g.name }}
+                </option>
+                {% endfor %}
+            </select>
+        </div>
+        <div class="col-md-2">
+            <button type="submit" class="btn btn-primary w-100">🔍 Buscar</button>
+        </div>
+    </form>
+
+    <!-- TABLA DE LIBROS -->
+    <div class="table-responsive">
+        <table class="table table-hover align-middle">
+            <thead class="table-primary">
+                <tr>
+                    <th>Portada</th>
+                    <th>Título</th>
+                    <th>Autor</th>
+                    <th>Géneros</th>
+                    <th>Copias</th>
+                    <th>Acciones</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for b in books %}
+                <tr>
+                    <td>
+                        <div class="book-cover-sm"></div>
+                    </td>
+                    <td><strong>{{ b.title }}</strong></td>
+                    <td>{{ b.author }}</td>
+                    <td>
+                        <small class="text-muted">{{ b.genre_names or 'Sin género' }}</small>
+                    </td>
+                    <td>
+                        <span class="badge bg-{{ 'success' if b.available > 0 else 'danger' }}">
+                            {{ b.available }} / {{ b.copies }}
+                        </span>
+                    </td>
+                    <td>
+                        <div class="d-flex gap-2 flex-wrap">
+                            <a href="{{ url_for('book.book_detail', book_id=b.id) }}" 
+                               class="btn btn-outline-primary btn-sm">Ver Detalle</a>
+                            
+                            {% if b.available > 0 %}
+                                <a href="{{ url_for('book.reserve_book', book_id=b.id) }}" 
+                                   class="btn btn-success btn-sm">Reservar</a>
+                            {% else %}
+                                <button class="btn btn-secondary btn-sm" disabled>No disponible</button>
+                            {% endif %}
+                            
+                            <a href="{{ url_for('book.toggle_favorite', book_id=b.id) }}" 
+                               class="btn btn-outline-warning btn-sm">
+                                {{ '❤️ Quitar' if b.id in favorite_ids else '♡ Favorito' }}
+                            </a>
+                        </div>
+                    </td>
+                </tr>
+                {% else %}
+                <tr>
+                    <td colspan="6" class="text-center py-5 text-muted">
+                        No se encontraron libros con los filtros aplicados.
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<style>
+.book-cover-sm {
+    width: 50px;
+    height: 70px;
+    background: #eee;
+    border-radius: 6px;
+    background-image: url('data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 140%22><rect width=%22100%22 height=%22140%22 fill=%22%23ddd%22/><text x=%2250%22 y=%2270%22 font-family=%22Arial%22 font-size=%2216%22 text-anchor=%22middle%22 fill=%22%23666%22 dominant-baseline=%22middle%22>Libro</text></svg>');
+    background-size: cover;
+}
+</style>
+{% endblock %}

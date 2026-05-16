@@ -1,0 +1,79 @@
+{% extends 'base.html' %}
+{% block title %}Recomendados{% endblock %}
+{% block content %}
+<div class="container mt-4">
+    <h2 class="mb-4 text-center">📚 Libros Recomendados para Ti</h2>
+    <p class="text-center text-muted mb-4">Basado en tus favoritos y reservas anteriores</p>
+
+    <!-- TABLA DE LIBROS -->
+    <div class="table-responsive">
+        <table class="table table-hover align-middle">
+            <thead class="table-primary">
+                <tr>
+                    <th>Portada</th>
+                    <th>Título</th>
+                    <th>Autor</th>
+                    <th>Géneros</th>
+                    <th>Copias</th>
+                    <th>Acciones</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for b in books %}
+                <tr>
+                    <td>
+                        <div class="book-cover-sm">
+                            <!-- Puedes agregar portada real después -->
+                        </div>
+                    </td>
+                    <td><strong>{{ b.title }}</strong></td>
+                    <td>{{ b.author }}</td>
+                    <td>
+                        <small class="text-muted">{{ b.genre_names or 'Sin género' }}</small>
+                    </td>
+                    <td>
+                        <span class="badge bg-{{ 'success' if b.available > 0 else 'danger' }}">
+                            {{ b.available }} / {{ b.copies }}
+                        </span>
+                    </td>
+                    <td>
+                        <div class="d-flex gap-2 flex-wrap">
+                            <a href="{{ url_for('book_detail', book_id=b.id) }}" class="btn btn-outline-primary btn-sm">Detalle</a>
+                            {% if b.available > 0 %}
+                                <a href="{{ url_for('reserve_book', book_id=b.id) }}" class="btn btn-success btn-sm">Reservar</a>
+                            {% else %}
+                                <button class="btn btn-secondary btn-sm" disabled>No disponible</button>
+                            {% endif %}
+                            <a href="{{ url_for('toggle_favorite', book_id=b.id) }}" class="btn btn-outline-warning btn-sm">
+                                Favorito
+                            </a>
+                        </div>
+                    </td>
+                </tr>
+                {% else %}
+                <tr>
+                    <td colspan="6" class="text-center py-4 text-muted">
+                        No hay recomendaciones disponibles. ¡Agrega algunos favoritos o haz reservas para obtener sugerencias personalizadas!
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<style>
+.book-cover-sm {
+    width: 50px;
+    height: 70px;
+    background: linear-gradient(135deg, #F4A460 0%, #D2691E 100%);
+    border-radius: 6px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-weight: bold;
+    font-size: 0.8rem;
+}
+</style>
+{% endblock %}
